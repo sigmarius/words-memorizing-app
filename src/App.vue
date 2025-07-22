@@ -1,10 +1,11 @@
 <script setup>
-let currentDate = new Date();
+import Button from './components/Button.vue';
 </script>
 
 <template>
-  <h1>{{ currentDate }}</h1>
+  <main>
+    <Button>Начать игру</Button>
+  </main>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

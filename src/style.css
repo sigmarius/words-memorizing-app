@@ -1,6 +1,26 @@
 :root {
+  --color-primary: #000000;
+  --color-secondary: #ffffff;
+  --color-accent: #008bfe;
+  --color-accent-hover: #006fcb;
+  --color-accent-light: #cce8ff;
+  --color-bg: #f0f4f8;
+  --font-family: "Roboto", sans-serif;
+}
+
+body {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  min-height: 100vh;
+
+  display: grid;
+  place-items: center;
+
+  font-family: var(--font-family);
+
+  color: var(--color-primary);
+  background-color: var(--color-bg);
 }
