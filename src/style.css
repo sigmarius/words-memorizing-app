@@ -1,9 +1,11 @@
 :root {
   --color-primary: #000000;
+  --color-header: #222222;
   --color-secondary: #ffffff;
   --color-accent: #008bfe;
   --color-accent-hover: #006fcb;
   --color-accent-light: #cce8ff;
+  --color-shadow: rgba(0, 0, 0, 0.1);
   --color-bg: #f0f4f8;
   --font-family: "Roboto", sans-serif;
 }
@@ -14,13 +16,20 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  min-height: 100vh;
-
-  display: grid;
-  place-items: center;
+  margin: 0;
 
   font-family: var(--font-family);
 
   color: var(--color-primary);
   background-color: var(--color-bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: 120px 1fr; /* Шапка высотой 120px, остальное пространство для main */
 }
