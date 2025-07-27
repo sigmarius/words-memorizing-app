@@ -1,11 +1,15 @@
 <script setup>
 import Score from './Score.vue';
+
+const { counter = 0 } = defineProps({
+    counter: Number
+});
 </script>
 
 <template>
     <header class="header">
         <h1>Запомни слово</h1>
-        <Score :counter="200" />
+        <Score :counter="counter" />
     </header>
 </template>
 

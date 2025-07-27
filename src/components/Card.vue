@@ -1,45 +1,66 @@
 <script setup>
+import { computed, ref } from 'vue';
+
 import IconSuccess from './icons/IconSuccess.vue';
 import IconFail from './icons/IconFail.vue';
-const { cardWord = 'example', cardNumber = 1 } = defineProps({
-    cardWord: String,
-    cardNumber: Number
+
+const { number = 1, word = 'example', translation = 'пример' } = defineProps({
+    number: Number,
+    word: String,
+    translation: String
 });
 
 const emits = defineEmits({
     flipCard: (payload) => {
-        console.log('Card flipped validation:', payload);
         return payload;
     },
     changeStatus: (payload) => {
-        console.log('Status changed validation:', payload);
         return payload;
     }
 });
 
-const cardFlip = (state) => {
-    emits('flipCard', { state, cardWord, cardNumber });
+let state = ref('closed'); // opened / closed
+let status = ref(''); // success / fail / pending
+
+let displayWord = computed(() => {
+    return state.value === 'opened' ? translation : word;
+});
+
+const cardFlip = () => {
+    state.value = 'opened';
+    status.value = 'pending';
+
+    emits('flipCard', { state: state.value, word, number });
 };
 
-const changeStatus = (status) => {
-    emits('changeStatus', { status, cardWord, cardNumber });
+const completeGuess = () => {
+    state.value = 'closed';
+    status.value = '';
+};
+
+const changeStatus = (payload) => {
+    status.value = payload;
+
+    emits('changeStatus', { status: status.value, word, number });
 };
 </script>
 
 <template>
     <div class="card">
         <div class="card__state">
-            <span class="card__number">{{ cardNumber }}</span>
-            <IconSuccess :icon-width="36" :icon-height="36" />
-            <IconFail :icon-width="48" :icon-height="48" />
+            <span class="card__number">{{ number }}</span>
+            <IconSuccess :icon-width="36" :icon-height="36" v-if="status === 'success'" />
+            <IconFail :icon-width="48" :icon-height="48" v-if="status === 'fail'" />
         </div>
-        <p class="card__word">{{ cardWord }}</p>
+        <!-- word / translation в зависимости от state -->
+        <p class="card__word">{{ displayWord }}</p>
         <div class="card__actions">
-            <p class="card__actions-name" @click="cardFlip('open')">Перевернуть</p>
+            <p class="card__actions-name" @click="cardFlip()" v-if="state === 'closed'">Перевернуть</p>
 
-            <p class="card__actions-name" @click="cardFlip('close')">Завершить</p>
+            <p class="card__actions-name" @click="completeGuess()" v-if="status === 'success' || status === 'fail'">
+                Завершено</p>
 
-            <div class=" card__actions-icons">
+            <div class="card__actions-icons" v-if="status === 'pending'">
                 <IconSuccess @click="changeStatus('success')" />
                 <IconFail @click="changeStatus('fail')" />
             </div>
