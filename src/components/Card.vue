@@ -1,13 +1,12 @@
 <script setup>
-import { computed, ref } from 'vue';
-
 import IconSuccess from './icons/IconSuccess.vue';
 import IconFail from './icons/IconFail.vue';
 
-const { number = 1, word = 'example', translation = 'пример' } = defineProps({
-    number: Number,
+const { word = 'example', index = 1, state = 'closed', status = '' } = defineProps({
     word: String,
-    translation: String
+    index: Number,
+    state: String,
+    status: String
 });
 
 const emits = defineEmits({
@@ -19,48 +18,52 @@ const emits = defineEmits({
     }
 });
 
-let state = ref('closed'); // opened / closed
-let status = ref(''); // success / fail / pending
-
-let displayWord = computed(() => {
-    return state.value === 'opened' ? translation : word;
-});
-
-const cardFlip = () => {
-    state.value = 'opened';
-    status.value = 'pending';
-
-    emits('flipCard', { state: state.value, word, number });
+const cardFlip = (state) => {
+    emits('flipCard', { index, state });
 };
 
-const completeGuess = () => {
-    state.value = 'closed';
-    status.value = '';
-};
-
-const changeStatus = (payload) => {
-    status.value = payload;
-
-    emits('changeStatus', { status: status.value, word, number });
+const changeStatus = (status) => {
+    emits('changeStatus', { index, status });
 };
 </script>
 
 <template>
     <div class="card">
         <div class="card__state">
-            <span class="card__number">{{ number }}</span>
-            <IconSuccess :icon-width="36" :icon-height="36" v-if="status === 'success'" />
-            <IconFail :icon-width="48" :icon-height="48" v-if="status === 'fail'" />
+            <span class="card__number">{{ index }}</span>
+            <IconSuccess 
+                :icon-width="36" 
+                :icon-height="36" 
+                v-if="status === 'success'" 
+            />
+            <IconFail 
+                :icon-width="48" 
+                :icon-height="48" 
+                v-if="status === 'fail'" 
+            />
         </div>
+
         <!-- word / translation в зависимости от state -->
-        <p class="card__word">{{ displayWord }}</p>
+        <p class="card__word">{{ word }}</p>
+
         <div class="card__actions">
-            <p class="card__actions-name" @click="cardFlip()" v-if="state === 'closed'">Перевернуть</p>
+            <p class="card__actions-name" 
+                @click="cardFlip('opened')" 
+                v-if="state === 'closed' && status === ''"
+            >
+                Перевернуть
+            </p>
 
-            <p class="card__actions-name" @click="completeGuess()" v-if="status === 'success' || status === 'fail'">
-                Завершено</p>
+            <p class="card__actions-name" 
+                @click="cardFlip('closed')" 
+                v-if="state === 'opened' && status !== 'pending'"
+            >
+                Завершено
+            </p>
 
-            <div class="card__actions-icons" v-if="status === 'pending'">
+            <div class="card__actions-icons" 
+                v-if="status === 'pending'"
+            >
                 <IconSuccess @click="changeStatus('success')" />
                 <IconFail @click="changeStatus('fail')" />
             </div>
