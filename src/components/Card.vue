@@ -121,6 +121,7 @@ const changeStatus = (status) => {
 }
 
 .card__word {
+    max-width: 80%;
     font-size: 18px;
     font-weight: 400;
     line-height: 24px;
