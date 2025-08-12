@@ -5,6 +5,8 @@ import Header from './components/Header.vue';
 import Button from './components/Button.vue';
 import Card from './components/Card.vue';
 
+const API_ENDPOINT = 'http://localhost:8080/api/random-words';
+
 let isGameStarted = ref(false);
 
 let counter = ref(100);
@@ -14,43 +16,35 @@ let status = ref(''); // success / fail / pending
 
 let selectedCardIdx = ref();
 
-let rawData = ref([
-  {
-    word: 'apple',
-    traslation: 'яблоко'
-  },
-  {
-    word: 'banana',
-    traslation: 'банан'
-  },
-  {
-    word: 'orange',
-    traslation: 'апельсин'
-  },
-  {
-    word: 'lemon',
-    traslation: 'лимон'
-  },
-  {
-    word: 'strawberry',
-    traslation: 'клубника'
-  },
-  {
-    word: 'tangerine',
-    traslation: 'мандарин'
-  },
-  {
-    word: 'cherry',
-    traslation: 'вишня'
+// Fetching data from the API and storing it in rawData
+let rawData = ref();
+
+let getApiData = async () => {
+  try {
+    const response = await fetch(API_ENDPOINT);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+
+    rawData.value = data;
+  } catch (error) {
+    console.error('Fetch error:', error);
   }
-]);
+};
 
 let cardData = computed(() => {
+  if (!rawData.value) {
+    return [];
+  }
+
   return rawData.value.map((item, index) => {
     let isCardActive = selectedCardIdx.value === index + 1;
 
     return {
-      word: isCardActive ? item.traslation : item.word,
+      word: isCardActive ? item.translation : item.word,
       index: index + 1,
       state: isCardActive ? state.value : 'closed',
       status: isCardActive ? status.value : '',
@@ -59,7 +53,8 @@ let cardData = computed(() => {
 });
 
 const handlePlayGame = (condition) => {
-  isGameStarted.value = condition;
+  isGameStarted.value = true;
+  getApiData();
 
   if (condition === false) {
     counter.value = 100;
@@ -73,7 +68,18 @@ const handleFlipCard = (payload) => {
   selectedCardIdx.value = payload.index;
 
   state.value = payload.state;
-  status.value = state.value === 'opened' ? 'pending' : '';
+  switch (state.value) {
+    case 'opened':
+      status.value = 'pending';
+      break;
+    case 'closed':
+      selectedCardIdx.value = null;
+      status.value = '';
+      break;
+    default:
+      status.value = '';
+      break;
+  }
 };
 
 const handleChangeStatus = (payload) => {
@@ -97,14 +103,26 @@ const handleChangeStatus = (payload) => {
   <main class="main">
     <template v-if="isGameStarted">
       <div class="cards">
-        <Card v-for="(card, index) in cardData" v-bind="card" :key="index" :index="index + 1"
-          @flip-card="handleFlipCard" @change-status="handleChangeStatus" />
+        <Card 
+          v-for="(card, index) in cardData" 
+          v-bind="card" 
+          :key="index" 
+          :index="index + 1"
+          @flip-card="handleFlipCard" 
+          @change-status="handleChangeStatus" 
+        />
       </div>
 
-      <Button @click="handlePlayGame(false)">Начать заново</Button>
+      <Button 
+        @click="handlePlayGame(false)">
+          Начать заново
+      </Button>
     </template>
 
-    <Button v-else @click="handlePlayGame(true)">Начать игру</Button>
+    <Button v-else 
+      @click="handlePlayGame(true)">
+      Начать игру
+    </Button>
   </main>
 </template>
 
