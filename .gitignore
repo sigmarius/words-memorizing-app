@@ -22,8 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-ebe10980-6392-46cc-b90a-531f991b1604.zip
-server/api-windows-386.exe
-server/api-windows-amd64.exe
 .gitignore
-server/muellerdict.db
+
