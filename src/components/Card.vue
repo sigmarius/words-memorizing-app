@@ -1,6 +1,6 @@
 <script setup>
-import IconSuccess from './icons/IconSuccess.vue';
-import IconFail from './icons/IconFail.vue';
+import IconSuccess from '@/components/icons/IconSuccess.vue';
+import IconFail from '@/components/icons/IconFail.vue';
 
 const { word = 'example', index = 1, state = 'closed', status = '' } = defineProps({
     word: String,

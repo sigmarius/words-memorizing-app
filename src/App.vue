@@ -1,15 +1,19 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, provide, ref } from 'vue';
 
-import Header from './components/Header.vue';
-import Button from './components/Button.vue';
-import Card from './components/Card.vue';
+import Header from '@/components/Header.vue';
+import Button from '@/components/Button.vue';
+import Card from '@/components/Card.vue';
 
-const API_ENDPOINT = 'http://localhost:8080/api/random-words';
+import { useRandomWords } from '@/composables/get-randow-words';
+import { INITIAL_COUNTER_VALUE, PROVIDE_COUNTER_VALUE } from '@/constants';
 
 let isGameStarted = ref(false);
 
-let counter = ref(100);
+let counter = ref(INITIAL_COUNTER_VALUE);
+
+// Передаем значение счетчика в дочерний компонент Score
+provide(PROVIDE_COUNTER_VALUE, counter);
 
 let state = ref('closed'); // opened / closed
 let status = ref(''); // success / fail / pending
@@ -18,22 +22,6 @@ let selectedCardIdx = ref();
 
 // Fetching data from the API and storing it in rawData
 let rawData = ref();
-
-let getApiData = async () => {
-  try {
-    const response = await fetch(API_ENDPOINT);
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const data = await response.json();
-
-    rawData.value = data;
-  } catch (error) {
-    console.error('Fetch error:', error);
-  }
-};
 
 let cardData = computed(() => {
   if (!rawData.value) {
@@ -44,7 +32,7 @@ let cardData = computed(() => {
     let isCardActive = selectedCardIdx.value === index + 1;
 
     return {
-      word: isCardActive ? item.translation : item.word,
+      word: isCardActive ? item.translations : item.source,
       index: index + 1,
       state: isCardActive ? state.value : 'closed',
       status: isCardActive ? status.value : '',
@@ -52,12 +40,12 @@ let cardData = computed(() => {
   });
 });
 
-const handlePlayGame = (condition) => {
+const handlePlayGame = async (condition) => {
   isGameStarted.value = true;
-  getApiData();
+  rawData.value = await useRandomWords();
 
   if (condition === false) {
-    counter.value = 100;
+    counter.value = INITIAL_COUNTER_VALUE;
     state.value = 'closed';
     status.value = '';
     selectedCardIdx.value = null;
@@ -85,12 +73,13 @@ const handleFlipCard = (payload) => {
 const handleChangeStatus = (payload) => {
   status.value = payload.status;
 
+  //При успешном ответе начисляем 10 баллов, при ошибке снимаем 4
   switch (payload.status) {
     case 'success':
-      counter.value++;
+      counter.value = counter.value + 10;
       break;
     case 'fail':
-      counter.value--;
+      counter.value = counter.value - 4;
       break;
     default:
       break;
@@ -99,7 +88,8 @@ const handleChangeStatus = (payload) => {
 </script>
 
 <template>
-  <Header :counter />
+  <Header />
+
   <main class="main">
     <template v-if="isGameStarted">
       <div class="cards">
