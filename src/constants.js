@@ -1,4 +1,7 @@
-export const API_ENDPOINT = '/data.json';
+export const API_ENDPOINT =
+	window.location.hostname === 'localhost' || window.location.protocol === 'file:'
+		? '/data.json'
+		: '/words-memorizing-app/data.json';
 
 export const MAX_WORDS_COUNT = 12;
 
