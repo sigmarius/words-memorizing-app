@@ -1,4 +1,4 @@
-import { API_ENDPOINT, LOCAL_STORAGE_WORDS_KEY, MAX_WORDS_COUNT } from "../constants";
+import { API_ENDPOINT, LOCAL_STORAGE_WORDS_KEY, MAX_WORDS_COUNT } from "@/constants";
 
 // Функция для получения и кэширования данных
 async function fetchAndCacheData() {
