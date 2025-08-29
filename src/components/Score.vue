@@ -1,9 +1,9 @@
 <script setup>
-import IconHearth from './icons/IconHearth.vue';
+import { inject } from 'vue';
+import IconHearth from '@/components/icons/IconHearth.vue';
+import { INITIAL_COUNTER_VALUE, PROVIDE_COUNTER_VALUE } from '@/constants';
 
-const { counter = 100 } = defineProps({
-    counter: Number
-})
+const counter = inject(PROVIDE_COUNTER_VALUE, INITIAL_COUNTER_VALUE);
 </script>
 
 <template>
